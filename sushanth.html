@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Interaction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Input</h1>
+        <form id="apiForm">
+            <div class="form-group">
+                <label for="data">Data (JSON Array):</label>
+                <input type="text" id="data" name="data" placeholder='["A", "C", "Z", "c", "i"]' required>
+                <small>Enter JSON array with straight quotes, e.g., ["A", "C", "Z", "c", "i"]</small>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <h2>API Response</h2>
+        <pre id="response"></pre>
+    </div>
+
+    <script>
+        document.getElementById('apiForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const data = document.getElementById('data').value;
+
+            // Validate JSON input
+            let jsonData;
+            try {
+                jsonData = JSON.parse(data);
+                if (!Array.isArray(jsonData)) {
+                    throw new Error('Input must be a JSON array.');
+                }
+            } catch (error) {
+                document.getElementById('response').textContent = `Error: ${error.message}`;
+                return;
+            }
+
+            try {
+                const response = await fetch('https://bajaj-new-avrz.onrender.com', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: jsonData })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+
+                const result = await response.json();
+                document.getElementById('response').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('response').textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
